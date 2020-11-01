@@ -1,5 +1,6 @@
 ---
 title: "IODS course project"
+Author: "Miikka Haapakoski"
 output:
   html_document:
     theme: cosmo
