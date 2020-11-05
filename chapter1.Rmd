@@ -14,6 +14,3 @@ date()
 ```
 
 The text continues here
-
-git config --global user.email miihaa@student.uef.fi
-git config --global user.name Huapis
