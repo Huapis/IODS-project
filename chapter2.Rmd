@@ -1,13 +1,11 @@
-# Insert chapter 2 title here
+# Chapter 2 title
 
 *Describe the work you have done this week and summarize your learning.*
 
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
+I did the data wrangling part and you can find it under "data" folder.
 
-```{r}
-date()
-```
+Learning2014.csv. Includes a 166 obstacles and 7 variables dataset. It has a data of course personal. Gender, Age, Global attitude toward statistics, and points how they did overall, in deep learning, strategic learning, surface learning. 
 
-Here we go again...
+Unfortunately because of my timetable with work, I didnt have time for the visualization and regression model. 
+
+# DATE: 05/11/2020
