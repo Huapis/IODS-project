@@ -54,5 +54,3 @@ gather(pormath) %>% glimpse
 
 library(openxlsx)
 write.xlsx(pormath,file="C:\\Users\\miikk\\Documents\\IODS-project\\data\\pormath.xlsx")
-
-pormath <- read_excel("data/pormath.xlsx")
