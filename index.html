@@ -437,6 +437,21 @@ summary {
 <li><a href="#about-the-project">About the project</a></li>
 <li><a href="#chapter-2-title">Chapter 2 title</a></li>
 <li><a href="#date-05112020">DATE: 05/11/2020</a></li>
+<li><a href="#standardize-the-variables">standardize the variables</a></li>
+<li><a href="#perform-principal-component-analysis-with-the-svd-method">perform principal component analysis (with the SVD method)</a></li>
+<li><a href="#draw-a-biplot-of-the-principal-component-representation-and-the-original-variables">draw a biplot of the principal component representation and the original variables</a></li>
+<li><a href="#create-and-print-out-a-summary-of-pca_human">create and print out a summary of pca_human</a></li>
+<li><a href="#rounded-percentages-of-variance-captured-by-each-pc">rounded percentages of variance captured by each PC</a></li>
+<li><a href="#print-out-the-percentages-of-variance">print out the percentages of variance</a></li>
+<li><a href="#create-object-pc_lab-to-be-used-as-axis-labels">create object pc_lab to be used as axis labels</a></li>
+<li><a href="#draw-a-biplot">draw a biplot</a></li>
+<li><a href="#load-the-data">load the data</a></li>
+<li><a href="#explore-the-dataset">explore the dataset</a></li>
+<li><a href="#column-names-to-keep-in-the-dataset">column names to keep in the dataset</a></li>
+<li><a href="#visualize-the-dataset">visualize the dataset</a></li>
+<li><a href="#multiple-correspondence-analysis">multiple correspondence analysis</a></li>
+<li><a href="#summary-of-the-model">summary of the model</a></li>
+<li><a href="#visualize-mca">visualize MCA</a></li>
 </ul>
 </div>
 
@@ -451,7 +466,7 @@ summary {
 <pre class="r"><code># This is a so-called &quot;R chunk&quot; where you can write R code.
 
 date()</code></pre>
-<pre><code>## [1] &quot;Fri Nov 06 01:07:19 2020&quot;</code></pre>
+<pre><code>## [1] &quot;Thu Nov 26 21:39:12 2020&quot;</code></pre>
 <p>The text continues here</p>
 <hr />
 </div>
@@ -466,6 +481,79 @@ date()</code></pre>
 <h1>DATE: 05/11/2020</h1>
 <hr />
 <p>(more chapters to be added similarly as we proceed with the course!)</p>
+<p>#— #title: “chapter5.Rmd” #author: “Miikka Haapakoski” #date: “11/26/2020” #output: html_document #— library(dplyr) library(ggplot2) library(GGally) library(tidyr) library(openxlsx) library(corrplot) library(knitr)</p>
+<p>#Analysis. Show a graphical overview of the data and show summaries of the variables in the data. Describe and interpret the outputs, commenting on the distributions of the variables and the relationships between them. (0-3 points)</p>
+<p>#1. Summary part human &lt;- read.table(“<a href="http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human2.txt" class="uri">http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human2.txt</a>”, sep=“,”, header=TRUE)</p>
+<p>dim(human) str(human) summary(human)</p>
+<p>ggpairs(human)</p>
+<p>cor(human) %&gt;% corrplot</p>
+<p>#2.</p>
+</div>
+<div id="standardize-the-variables" class="section level1">
+<h1>standardize the variables</h1>
+<p>human_std &lt;- scale(human)</p>
+<p>summary(human_std)</p>
+</div>
+<div id="perform-principal-component-analysis-with-the-svd-method" class="section level1">
+<h1>perform principal component analysis (with the SVD method)</h1>
+<p>pca_human &lt;- prcomp(human_std)</p>
+</div>
+<div id="draw-a-biplot-of-the-principal-component-representation-and-the-original-variables" class="section level1">
+<h1>draw a biplot of the principal component representation and the original variables</h1>
+<p>biplot(pca_human, choices = 1:2, cex = c(0.8, 1), col = c(“grey40”, “deeppink2”))</p>
+<p>#3.</p>
+</div>
+<div id="create-and-print-out-a-summary-of-pca_human" class="section level1">
+<h1>create and print out a summary of pca_human</h1>
+<p>s &lt;- summary(pca_human) s</p>
+</div>
+<div id="rounded-percentages-of-variance-captured-by-each-pc" class="section level1">
+<h1>rounded percentages of variance captured by each PC</h1>
+<p>pca_pr &lt;- round(100*s$importance[2,], digits = 1)</p>
+</div>
+<div id="print-out-the-percentages-of-variance" class="section level1">
+<h1>print out the percentages of variance</h1>
+<p>pca_pr</p>
+</div>
+<div id="create-object-pc_lab-to-be-used-as-axis-labels" class="section level1">
+<h1>create object pc_lab to be used as axis labels</h1>
+<p>pc_lab &lt;- paste0(names(pca_pr), &quot; (“, pca_pr,”%)&quot;)</p>
+</div>
+<div id="draw-a-biplot" class="section level1">
+<h1>draw a biplot</h1>
+<p>biplot(pca_human, cex = c(0.8, 1), col = c(“grey40”, “deeppink2”), xlab = pc_lab[1], ylab = pc_lab[2])</p>
+<p>#5. # install and access the FactoMineR package if (!require(“devtools”)) install.packages(“devtools”) library(devtools) install_github(“husson/FactoMineR”)</p>
+<p>library (FactoMineR)</p>
+</div>
+<div id="load-the-data" class="section level1">
+<h1>load the data</h1>
+<p>data(“tea”)</p>
+</div>
+<div id="explore-the-dataset" class="section level1">
+<h1>explore the dataset</h1>
+<p>str(tea) dim (tea)</p>
+</div>
+<div id="column-names-to-keep-in-the-dataset" class="section level1">
+<h1>column names to keep in the dataset</h1>
+<p>keep_columns &lt;- c(“Tea”, “How”, “how”, “sugar”, “where”, “lunch”)</p>
+<p>tea_time &lt;- select(tea, one_of(keep_columns))</p>
+</div>
+<div id="visualize-the-dataset" class="section level1">
+<h1>visualize the dataset</h1>
+<p>gather(tea_time) %&gt;% ggplot(aes(value)) + facet_wrap(“key”, scales = “free”) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))</p>
+</div>
+<div id="multiple-correspondence-analysis" class="section level1">
+<h1>multiple correspondence analysis</h1>
+<p>mca &lt;- MCA(tea_time, graph = FALSE)</p>
+</div>
+<div id="summary-of-the-model" class="section level1">
+<h1>summary of the model</h1>
+<p>summary(mca)</p>
+</div>
+<div id="visualize-mca" class="section level1">
+<h1>visualize MCA</h1>
+<p>plot(mca, invisible=c(“ind”), habillage = “quali”)</p>
+<p>#According to the plots, most of the people drink tea from the tea bags without anything added. Tea is mainly drank not on the lunch and sugar is about 50%. Earl grey is the most popular tea and its bought from the chain store.</p>
 </div>
 
 

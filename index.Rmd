@@ -9,6 +9,7 @@ output:
     fig_caption: true
     fig_width: 6
     fig_height: 4
+    
 ---
 
 ***
@@ -16,16 +17,18 @@ output:
 # Introduction to Open Data Science - Course Project
 
 ```{r child = "chapter1.Rmd"}
-Chapter one completed. 
+#Chapter one completed. 
 ```
   
 ***
   
 ```{r child = "chapter2.Rmd"}
-I did the data wrangling and describing part of the task.  
+#I did the data wrangling and describing part of the task.  
 ```
 
 ***
 
 (more chapters to be added similarly as we proceed with the course!)
+
+```{r child = "chapter5.Rmd"}
 
