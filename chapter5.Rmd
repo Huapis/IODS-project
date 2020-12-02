@@ -4,6 +4,7 @@
 #date: "11/26/2020"
 #output: html_document
 #---
+```{r}
 library(dplyr)
 library(ggplot2)
 library(GGally)
@@ -11,11 +12,13 @@ library(tidyr)
 library(openxlsx)
 library(corrplot)
 library(knitr)
+```
 
 #Analysis. Show a graphical overview of the data and show summaries of the variables in the data. Describe and interpret the outputs, commenting on the distributions of the variables and the relationships between them. (0-3 points)
 
 
 #1. Summary part 
+```{r}
 human <- read.table("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human2.txt", sep=",", header=TRUE)
 
 dim(human)
@@ -26,9 +29,10 @@ summary(human)
 ggpairs(human)
 
 cor(human) %>% corrplot
+```
 
 #2. 
-
+```{r}
 # standardize the variables
 human_std <- scale(human)
 
@@ -39,10 +43,10 @@ pca_human <- prcomp(human_std)
 
 # draw a biplot of the principal component representation and the original variables
 biplot(pca_human, choices = 1:2, cex = c(0.8, 1), col = c("grey40", "deeppink2"))
-
+```
 
 #3. 
-
+```{r}
 # create and print out a summary of pca_human
 s <- summary(pca_human)
 s
@@ -58,9 +62,10 @@ pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
 
 # draw a biplot
 biplot(pca_human, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
-
+```
 #5. 
 # install and access the FactoMineR package
+```{r}
 if (!require("devtools")) install.packages("devtools")
 library(devtools)
 install_github("husson/FactoMineR")

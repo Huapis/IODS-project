@@ -1,0 +1,191 @@
+#---
+#title: "chapter6"
+#author: "Miikka Haapakoski"
+#date: "12/2/2020"
+#output: html_document
+---
+
+```{r}
+#Libraries
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(corrplot)
+library(knitr)
+```
+
+#Easiest way of getting the data imported, is to get RATS and MABS from the last data wranling phase. 
+```{r}
+BPRSL <- read.table(file="~/R/win-library/4.0/IODS-project/data/BPRSL.txt", header = TRUE, sep  =" ")
+RATSL <- read.table(file="~/R/win-library/4.0/IODS-project/data/RATSL.txt", header = TRUE, sep = '\t')
+
+summary(BPRSL)
+summary(RATSL)
+
+dim(BPRSL)
+dim(RATSL)
+
+
+```
+
+```{r}
+# Factor variables ID and Group
+RATSL$ID <- factor(RATSL$ID)
+RATSL$Group <- factor(RATSL$Group)
+
+#Table 8.1 with RATSL data
+
+kable(RATSL)
+
+# Plot the RATSL data
+ggplot(RATSL, aes(x = Time, y = Weight, group = ID)) +
+  geom_line(aes(linetype = Group)) +
+  scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 10)) +
+  scale_y_continuous(name = "Weight (grams)") +
+  theme(legend.position = "top")
+
+``` 
+#Figure 8.1 with RATSL data 
+```{r}
+ggplot(RATSL, aes(x = Time, y = Weight, linetype = ID)) +
+  geom_line() + scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) + 
+  theme_bw() + theme(legend.position = "none") +
+  theme(panel.grid.minor.y = element_blank()) +
+  scale_y_continuous(limits = c(min(RATSL$Weight), max(RATSL$Weight)))
+```
+
+#Figure 8.2. with RATSL data
+```{r}
+# Standardise the variable Weight
+RATSL <- RATSL %>%
+  group_by(Time) %>%
+  mutate(stdweight = (Weight - mean(Weight))/sd(Weight) ) %>%
+  ungroup()
+
+# Glimpse the data
+glimpse(RATSL)
+
+# Plot again with the standardised Weight
+ggplot(RATSL, aes(x = Time, y = stdweight, linetype = ID)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  scale_y_continuous(name = "standardised Weight") +
+  theme_bw() + theme(legend.position = "none")
+```
+## Figure 8.3 with RATSL
+
+```{r}
+# Number of weeks, baseline (week 0) included
+n <- RATSL$Time %>% unique() %>% length()
+
+# Summary data with mean and standard error
+RATSS <- RATSL %>%
+  group_by(Group, Time) %>%
+  summarise( mean=mean(Weight), se=sd(Weight)/sqrt(n) ) %>%
+  ungroup()
+
+# Glimpse the data
+glimpse(RATSS)
+
+# Plot the mean profiles
+ggplot(RATSS, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
+  geom_line() + scale_linetype_manual(values = c(1,2,3)) +
+  geom_point(size=3) + scale_shape_manual(values = c(1,2,3)) +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se, linetype="1"), width=0.3) +
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = c(0.8,0.3)) +
+  scale_y_continuous(name = "mean(weight) +/- se(weight)")
+
+# Create a summary data by  and Weight with mean as the summary variable (ignoring baseline week 0).
+RATSL8S <- RATSL %>%
+  filter(Time > 0) %>%
+  group_by(Group, ID) %>%
+  summarise( mean=mean(Weight) ) %>%
+  ungroup()
+
+# Glimpse the data
+glimpse(RATSL8S)
+
+# Draw a boxplot of the mean versus Weight
+ggplot(RATSL8S, aes(x = Group, y = mean)) +
+  geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "white") +
+  scale_y_continuous(name = "mean(Weight), Time")
+  
+```
+
+```{r}
+# Create a new data by filtering the outlier group and adjust the ggplot code the draw the plot again with the new data
+RATSL8S1 <- RATSL8S %>%
+  filter(Group != 3)
+  
+# Glimpse the data
+glimpse(RATSL8S1)
+
+  
+# Perform a two-sample t-test with groups 1 and 2
+
+
+t.test(mean ~ Group, data = RATSL8S1, var.equal = TRUE)
+kable(RATSL8S1)
+```
+
+#Table and figure 9.1 with BPRSL 
+
+# Factor treatment & subject
+BPRS$treatment <- factor(BPRS$treatment)
+BPRS$subject <- factor(BPRS$subject)
+
+```{r}
+kable(BPRSL)
+
+ggplot(BPRSL, aes(x = week, y = bprs, group = subject)) +
+  geom_text(aes(label = treatment)) +
+  scale_x_continuous(name = "Time (weeks)", breaks = seq(0, 8, 1)) +
+  scale_y_continuous(name = "bprs (score)") + 
+  theme(legend.position = "top")
+
+```
+
+#Regression model 
+
+```{r}
+# create a regression model BPRSL_reg
+BPRSL_reg <- lm(bprs ~ week + treatment, data = BPRSL)
+
+# print out a summary of the model
+summary(BPRSL_reg)
+```
+
+```{r}
+# access library lme4
+library(lme4)
+
+# Create a random intercept model
+BPRSL_ref <- lmer(bprs ~ week + treatment + (1 | subject), data = BPRSL, REML = FALSE)
+
+# Print the summary of the model
+summary(BPRSL_ref)
+
+
+# create a random intercept and random slope model
+BPRSL_ref1 <- lmer(bprs ~ week + treatment + (week | subject), data = BPRSL, REML = FALSE)
+
+# print a summary of the model
+summary(BPRSL_ref1)
+
+# perform an ANOVA test on the two models
+anova(BPRSL_ref1, BPRSL_ref)
+
+```
+```{r}
+# create a random intercept and random slope model
+BPRSL_ref2 <- lmer(bprs ~ week * treatment + (week | subject), data = BPRSL, REML = FALSE)
+# print a summary of the model
+summary(BPRSL_ref2)
+# perform an ANOVA test on the two models
+anova(BPRSL_ref2, BPRSL_ref1)
+```
+
